@@ -45,6 +45,13 @@ public class Day {
     }
 
     /**
+     * @return the days date in string form e.g. Monday, February 17th, 2014
+     */
+    public String getDate(){
+        return date;
+    }
+
+    /**
      * @return a human readable representation of the day's menu
      */
     public String toString(){
