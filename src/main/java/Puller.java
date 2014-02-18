@@ -12,7 +12,7 @@ public class Puller {
    public static void main(String[] args){
        Week week = new Week();
        System.out.println(week.toString());
-       Meal tuesdayLunch = week.getDay(Week.TUESDAY).getLunch();
+       Meal tuesdayLunch = week.getDay(Weekday.TUESDAY).getLunch();
        ArrayList<MenuItem> veganOptions = tuesdayLunch.getMenuItemsWith("vegan");
        for (MenuItem option : veganOptions){
            System.out.println(option.toString());

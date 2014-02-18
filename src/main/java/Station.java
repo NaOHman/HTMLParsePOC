@@ -4,8 +4,8 @@ import java.util.ArrayList;
  * a Station represents an actual station in cafe mac and contains menu items
  */
 public class Station {
-    String name;
-    ArrayList<MenuItem> menuItems;
+    private String name;
+    private ArrayList<MenuItem> menuItems;
 
     /**
      * Creates a station
@@ -31,6 +31,12 @@ public class Station {
         return menuItems;
     }
 
+    /**
+     * @return returns station's name
+     */
+    public String getName(){
+        return name;
+    }
     /**
      * @return a human readable representation of the Station
      */

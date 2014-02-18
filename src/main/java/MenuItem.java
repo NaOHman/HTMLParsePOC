@@ -9,10 +9,10 @@ import java.util.ArrayList;
  * it also contains data about the food such as dietary restrictions
  */
 public class MenuItem {
-    String name;
-    String description;
-    Station location;
-    ArrayList<String> restrictions;
+    private String name;
+    private String description;
+    private Station location;
+    private ArrayList<String> restrictions;
     // ArrayList<Review> reviews;
 
     /* takes an HTML element representing a food and then

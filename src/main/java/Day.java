@@ -8,9 +8,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Day {
-    String date="";
-    Meal lunch;
-    Meal dinner;
+    private String date="";
+    private Meal lunch;
+    private Meal dinner;
 
     /**
      * Creates a new daily menu object containing 2 meals, lunch and dinner

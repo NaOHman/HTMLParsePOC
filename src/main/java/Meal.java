@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 
 public class Meal {
-    ArrayList <Station> stations;
+    private ArrayList <Station> stations;
     //int mealScore
 
     /**

@@ -11,16 +11,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-public class Week {
-    public static final int SUNDAY = 0;
-    public static final int MONDAY = 1;
-    public static final int TUESDAY = 2;
-    public static final int WEDNESDAY = 3;
-    public static final int THURSDAY = 4;
-    public static final int FRIDAY = 5;
-    public static final int SATURDAY = 6;
 
-    Day[] days = new Day[7];
+public class Week {
+
+    private Day[] days = new Day[7];
 
     /**
      * creates a new weekly menu by scraping data from the Bon Appetit website
@@ -54,8 +48,8 @@ public class Week {
      * @param day a day of the week represented as an int
      * @return the daily menu of that day
      */
-    public Day getDay(int day){
-        return days[day];
+    public Day getDay(Weekday day){
+        return days[day.ordinal()];
     }
 
     /**
