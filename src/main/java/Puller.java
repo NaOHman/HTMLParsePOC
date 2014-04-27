@@ -2,6 +2,11 @@
  * Created by jeffrey on 2/11/14.
  */
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOError;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -10,12 +15,18 @@ import java.util.ArrayList;
  */
 public class Puller {
    public static void main(String[] args){
-       Week week = new Week();
-       System.out.println(week.toString());
-       Meal tuesdayLunch = week.getDay(Weekday.TUESDAY).getLunch();
-       ArrayList<MenuItem> veganOptions = tuesdayLunch.getMenuItemsWith("vegan");
-       for (MenuItem option : veganOptions){
-           System.out.println(option.toString());
+       try{
+           Document doc = Jsoup.connect("http://macalester.cafebonappetit.com/hungry/cafe-mac/").get();
+           Week week = new Week(doc);
+           System.out.println(week.getFoods().size());
+           week.clean();
+           System.out.println(week.getFoods().size());
+       } catch (IOException e){
+
        }
    }
+    private static int countLines(String str){
+        String[] lines = str.split("\r\n|\r|\n");
+        return  lines.length;
+    }
 }

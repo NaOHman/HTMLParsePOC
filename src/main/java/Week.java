@@ -5,43 +5,46 @@
  * parse the menu from cafe mac's website
  */
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class Week {
 
     private Day[] days = new Day[7];
 
-    /**
-     * creates a new weekly menu by scraping data from the Bon Appetit website
+    /**     * creates a new weekly menu by scraping data from the Bon Appetit website
      */
-    public Week(){
-        try {
-            Document doc = Jsoup.connect("http://macalester.cafebonappetit.com/hungry/cafe-mac/").get();
-            Elements dayData = doc.getElementsByClass("eni-menu-day");
-            makeDays(dayData);
-        }
-        //this means connection was probably lost
-        catch(IOException e){
-            System.out.println("No Connection");
-        }
-    }
-
-    /**
-     * helper method for the constructor that creates daily menus and stores them inside the weekly menu
-     * @param dayData a collection of HTML elements with the data needed to create daily menus
-     */
-    public void makeDays(Elements dayData){
+    public Week(Document doc){
+        Elements dayData = doc.getElementsByClass("eni-menu-day");
         // Days of week start with 0 on Sunday
         for (Element dayMenu : dayData){
             String dayOfWeek = dayMenu.className();
-            dayOfWeek = dayOfWeek.substring(dayOfWeek.length() -1);
+            String date =
+                    dayOfWeek = dayOfWeek.substring(dayOfWeek.length() -1);
             days[Integer.parseInt(dayOfWeek)] = new Day(dayMenu);
         }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setFirstDayOfWeek(Calendar.SUNDAY);
+        int today = calendar.get(Calendar.DAY_OF_WEEK);
+        calendar.add(Calendar.DATE, -today);
+        for(int i=0; i<7; i++){
+            calendar.add(Calendar.DATE, 1);
+            if (days[i] != null)
+                days[i].setDate(calendar.getTime());
+        }
+    }
+
+    public Day[] getDays(){
+        return days;
+    }
+
+    public void setDay(Day day, Weekday dayOfWeek){
+        days[dayOfWeek.ordinal()] = day;
     }
 
     /**
@@ -52,14 +55,81 @@ public class Week {
         return days[day.ordinal()];
     }
 
-    /**
-     * @return a human readable version of the Week's menu
-     */
-    public String toString(){
-        String menu = "";
-        for (Day day : days){
-            menu = menu + day.toString() + "\n";
-        }
-        return menu;
+    // Check if days array is all null
+    public boolean isEmpty(){
+        for (Day day: days)
+            if (day != null)
+                return false;
+        return true;
     }
+    public String toString(){
+        String week = "";
+        for (Day day : days)
+            week += day.toString();
+        return week;
+    }
+    public void clean(){
+        List<Food> foods = new ArrayList<Food>();
+        List<Food> oldFoods = new ArrayList<Food>();
+        for(Day day : days)
+            for(Meal meal : day.getRealMeals())
+                for(Station station :meal.getStations()) {
+                    oldFoods.addAll(station.getFoods());
+                    station.getFoods().clear();
+                }
+        if(oldFoods.size() == 0)
+            return;
+        foods.add(oldFoods.get(0));
+        for(Food food : oldFoods){
+            boolean duplicate = false;
+            for(Food newFood : foods){
+                if (food.equals(newFood)) {
+                    newFood.getStations().addAll(food.getStations());
+                    duplicate = true;
+                }
+            }
+            if (!duplicate)
+                foods.add(food);
+        }
+        for(Food food : foods)
+            for(Station station: food.getStations())
+                station.addFood(food);
+    }
+
+    public Set<Food> getFoods(){
+        Set<Food> oldFoods = new HashSet<Food>();
+        for(Day day : days)
+            for(Meal meal : day.getRealMeals())
+                for(Station station :meal.getStations())
+                    oldFoods.addAll(station.getFoods());
+        return oldFoods;
+    }
+    public Set<Food> getStrippedFoods(){
+        Set<Food> oldFoods = new HashSet<Food>();
+        for(Day day : days)
+            for(Meal meal : day.getRealMeals())
+                for(Station station :meal.getStations())
+                    for(Food food: station.getFoods()){
+                        food.getStations().remove(station);
+                        oldFoods.add(food);
+                    }
+        return oldFoods;
+    }
+    public void mergeFoods(Set<Food> oldFoods){
+        if (oldFoods.size() == 0)
+            return;
+        Set<Food> foods = getFoods();
+        for(Food oldFood: oldFoods){
+            for(Food food : foods){
+                if(food.equals(oldFood)){
+                    food.getStations().addAll(oldFood.getStations());
+                    food.getReviews().addAll(oldFood.getReviews());
+                    food.setRating(oldFood.getRating());
+                    food.setRatingCount(oldFood.getRatingCount());
+                }
+            }
+        }
+    }
+
+
 }

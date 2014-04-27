@@ -1,76 +1,76 @@
-import java.util.ArrayList;
+
+import java.util.*;
+
 /**
  * Created by jeffrey on 2/11/14.
  * a Station represents an actual station in cafe mac and contains menu items
  */
+
+
 public class Station {
+    private Long id;
     private String name;
-    private ArrayList<MenuItem> menuItems;
+
+    private Meal meal;
+
+    private Set<Food> foods;
+
+    public Station(){}
 
     /**
      * Creates a station
      * @param name the name of the Station e.g. South
      */
-    public Station(String name){
+    public Station(String name, Meal meal){
         this.name = name;
-        menuItems = new ArrayList<MenuItem>();
+        foods = new HashSet<Food>();
+        this.meal = meal;
     }
 
-    /**
-     * adds a menu item to the station
-     * @param menuItem a menu item served at the station
-     */
-    public void addMenuItem(MenuItem menuItem){
-       menuItems.add(menuItem);
+    public void setMeal(Meal meal) {
+        this.meal = meal;
     }
 
-    /**
-     * @return all the menu items served at the station
-     */
-    public ArrayList<MenuItem> getMenuItems(){
-        return menuItems;
+    public Meal getMeal(){
+        return meal;
     }
 
-    /**
-     * @return returns station's name
-     */
+    public void addFood(Food food){
+       foods.add(food);
+    }
+
+    public void setFoods(Set<Food> foods){
+        this.foods = foods;
+    }
+
+    public Set<Food> getFoods(){
+        return foods;
+    }
+
     public String getName(){
         return name;
     }
-    /**
-     * @return a human readable representation of the Station
-     */
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public boolean equals(Station other){
+        return this.name == other.name;
+    }
+
     public String toString(){
-        String station = name + "\n";
-        for (MenuItem menuItem : menuItems){
-            station = station + menuItem.toString() + "\n";
-        }
+        String station = "--"+name +"\n";
+        for (Food food : foods)
+            station += "---" + food.getName() + "\n";
         return station;
-    }
-
-    /**
-     * @param restriction a dietary restriction either vegan, vegetarian, made-without-gluten, or seafood-watch
-     * @return a list of all items at the station that match the restriction e.g. all vegan options
-     */
-    public ArrayList<MenuItem> getMenuItemsWith(String restriction){
-        ArrayList<MenuItem> items = new ArrayList<MenuItem>();
-        for (MenuItem menuItem : menuItems){
-            if (menuItem.hasRestriction(restriction))
-                items.add(menuItem);
-        }
-        return items;
-    }
-
-    /**
-     * @param restriction a dietary restriction either vegan, vegetarian, made-without-gluten, or seafood-watch
-     * @return a list of all items at the station without the restriction e.g. all items not on seafood watch
-     */
-    public ArrayList<MenuItem> getMenuItemsWithout(String restriction){
-        ArrayList<MenuItem> items = new ArrayList<MenuItem>();
-        for (MenuItem menuItem : menuItems){
-            if (!menuItem.hasRestriction(restriction))
-                items.add(menuItem);
-        }
-        return items;
     }
 }

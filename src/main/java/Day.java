@@ -7,58 +7,67 @@
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class Day {
     private String date="";
-    private Meal lunch;
-    private Meal dinner;
+    private Meal[] meals = new Meal[3];
 
     /**
      * Creates a new daily menu object containing 2 meals, lunch and dinner
      * @param dayElem an HTML element that contains the data needed to create a daily menu
      */
     public Day(Element dayElem){
-        Elements meals = dayElem.select(".row-item > .my-day-menu-table");
-        if (dayElem.select("> *").hasClass("menu-date-heading")){
-            date = dayElem.getElementsByClass("menu-date-heading").first().text();
-            dinner = new Meal(meals.get(1));
-            lunch = new Meal(meals.get(0));
+        Element mealData = dayElem.select(".row-item").first();
+        if (mealData != null){
+            Elements  meals = mealData.children();
+            if (dayElem.select("> *").hasClass("menu-date-heading"))
+                date = dayElem.getElementsByClass("menu-date-heading").first().text();
+            for (int i=0; i<meals.size(); i++){
+                String type = meals.get(i).text();
+                MealType mealType= MealType.valueOf(type.toUpperCase());
+                i++;
+                setMeal(new Meal(meals.get(i) , mealType), mealType);
+            }
         }
-        else{
-            //this means there's no menu for the day
-            lunch = null;
-            dinner = null;
+    }
+    public Day(){
+    }
+
+    public void setDate(Date date1){
+        for (Meal meal : meals) {
+            if (meal != null)
+                meal.setDate(date1);
         }
     }
 
-    /**
-     * @return the dinner meal of a given day
-     */
-    public Meal getDinner(){
-        return dinner;
+    public Meal[] getMeals() {
+        return meals;
     }
 
-    /**
-     * @return the lunch meal of a given day
-     */
-    public Meal getLunch(){
-        return lunch;
+    public void setMeals(Meal[] meals) {
+        this.meals = meals;
     }
-
-    /**
-     * @return the days date in string form e.g. Monday, February 17th, 2014
-     */
-    public String getDate(){
-        return date;
+    public void setMeal(Meal meal, MealType type){
+         meals[type.ordinal()] = meal;
     }
-
-    /**
-     * @return a human readable representation of the day's menu
-     */
+    public Meal getMeal(MealType type){
+        return meals[type.ordinal()];
+    }
     public String toString(){
-        if (lunch != null){
-            return date + "\nLUNCH \n" + lunch.toString() + "\nDINNER\n" + dinner.toString();
-        } else{
-            return "No Menu Published";
-        }
+        String day = date +"\n";
+        for (Meal meal: meals)
+            if (meal != null)
+                day += meal.toString();
+        return day;
+    }
+    public List<Meal> getRealMeals(){
+        List<Meal> mealList = new ArrayList<Meal>();
+        for(Meal meal : meals)
+            if (meal != null)
+                mealList.add(meal);
+        return mealList;
     }
 }

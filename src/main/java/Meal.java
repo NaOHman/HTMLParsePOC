@@ -1,7 +1,9 @@
+
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by jeffrey on 2/11/14.
@@ -9,86 +11,86 @@ import java.util.ArrayList;
  */
 
 public class Meal {
-    private ArrayList <Station> stations;
-    //int mealScore
+    private Long mealId; //DB only
 
+    private Set<Station> stations;
+
+    private Date date;
+
+    private MealType mealType; //DB only
     /**
      * constructor that creates a meal
      * @param mealData HTML Element containing the data needed to make a meal
      */
-    public Meal(Element mealData){
-        stations = new ArrayList<Station>();
+    public Meal(Element mealData, MealType mealType){
+        this.mealType = mealType;
+        stations = new HashSet<Station>();
         Elements items = mealData.select("tbody > *");
-        makeStations(items);
-    }
-
-    /**
-     * a helper method for the constructor that creates a station objects
-     * @param items a collection of HTML elements that contain data relavent to the
-     *              creation of a meal
-     */
-    private void makeStations(Elements items){
-        Station currentStation = new Station("");
-         for (Element item : items){
+        Station currentStation = new Station("", this);
+        for (Element item : items){
             if (item.hasClass("menu-station")) {
                 String stationName = item.getElementsByTag("td").first().text();
-                currentStation = new Station(stationName);
+                currentStation = new Station(stationName, this);
                 stations.add(currentStation);
             } else if (item.hasClass("price-")) {
-                MenuItem food = new MenuItem(item, currentStation);
-                currentStation.addMenuItem(food);
+                Food food = new Food(item);
+                currentStation.addFood(food);
+                food.addStation(currentStation);
             }
         }
     }
 
-    /**
-     * Returns all menu items in served during a meal
-     * @return all the menu items at a meal
-     */
-    public ArrayList<MenuItem> getMenuItems(){
-        ArrayList<MenuItem> items = new ArrayList<MenuItem>();
-        for (Station station : stations)
-            items.addAll(station.getMenuItems());
-        return items;
+    public Meal(){
+        stations = new HashSet<Station>();
     }
 
-    /**
-     * @param restriction a dietary restriction, vegetarian, vegan, made-without-gluten, or seafood-watch
-     * @return all the menu items in a meal that have the restriction e.g. all vegan items
-     */
-    public ArrayList<MenuItem> getMenuItemsWith(String restriction){
-        ArrayList<MenuItem> items = new ArrayList<MenuItem>();
-        for (Station station : stations)
-            items.addAll(station.getMenuItemsWith(restriction));
-        return items;
+    public void setStations(Set<Station> stations){
+        this.stations = stations;
     }
 
-    /**
-     * @param restriction a dietary restriction, vegetarian, vegan, made-without-gluten, or seafood-watch
-     * @return all the menu items in a meal without that restriction e.g. all items not on seafood-watch
-     */
-    public ArrayList<MenuItem> getMenuItemsWithout(String restriction){
-        ArrayList<MenuItem> items = new ArrayList<MenuItem>();
-        for (Station station : stations)
-            items.addAll(station.getMenuItemsWithout(restriction));
-        return items;
+    public void setDate(Date date, MealType mealType){
+        this.date = date;
+        this.mealType = mealType;
     }
 
-    /**
-     * @return a list of all the stations in a given meal
-     */
-    public ArrayList<Station> getStations(){
+    public Set<Station> getStations(){
         return stations;
     }
 
-    /**
-     * @return a human readable version of the meal
-     */
+    public MealType getMealType() {
+        return mealType;
+    }
+
+    public void setMealType(MealType mealType) {
+        this.mealType = mealType;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Long getId() {
+        return mealId;
+    }
+
+    public void setId(Long id) {
+        this.mealId = mealId;
+    }
+
     public String toString(){
-        String meal = "";
-        for (Station station : stations){
-            meal = meal + station.toString();
-        }
+        String meal = "-" + mealType.toString() +"\n";
+        for(Station station : stations)
+            meal += station.toString();
         return meal;
+    }
+
+    public boolean sameMeal(Meal other){
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        return fmt.format(this.date).equals(fmt.format(other.date))
+                && (this.mealType == other.mealType);
     }
 }
